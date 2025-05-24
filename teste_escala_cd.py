@@ -65,11 +65,7 @@ def mostrar_notificacoes(nome_usuario, df):
     # Filtrar notificações para o CRM do usuário
     df_notif = df[df["crm original"] == crm_usuario]
 
-    # Exibir debug
-    st.write("Linhas filtradas por CRM original:")
-    st.dataframe(df_notif)
-    st.write("CRM original na planilha:", df["crm original"].unique())
-    st.write("CRM do usuário logado:", crm_usuario)
+    
 
     # Converter e filtrar datas válidas
     df_notif["data"] = pd.to_datetime(df_notif["data"], errors="coerce").dt.date
