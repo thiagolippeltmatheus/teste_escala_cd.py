@@ -70,6 +70,8 @@ def mostrar_notificacoes(nome_usuario, df):
     # Converter e filtrar datas válidas
     df_notif["data"] = pd.to_datetime(df_notif["data"], errors="coerce").dt.date
     df_notif = df_notif[df_notif["data"].notna()]
+    hoje = date.today()
+    df_notif = df_notif[df_notif["data"] >= hoje]
 
     # Exibir notificações
     if df_notif.empty:
