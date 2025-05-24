@@ -50,25 +50,32 @@ def tratar_campo(valor):
 
 
 def mostrar_notificacoes(nome_usuario, df):
-    # Corrige tipo de crm original para string de inteiro
-    df["crm original"] = df["crm original"].apply(lambda x: str(int(float(x))) if pd.notna(x) else "")
+    # Obter CRM do usuário logado como string
     crm_usuario = str(int(df_usuarios[df_usuarios["nome"] == nome_usuario]["crm"].values[0]))
 
-    # Filtra notificações em que o usuário logado é o repassador (via CRM)
-    df_notif = df[
-        df["crm original"].notna() &
-        df["crm original"].str.strip().ne("") &
-        df["crm original"].str.strip() == crm_usuario.strip()
-    ]
+    def formatar_crm_original(valor):
+        try:
+            return str(int(float(valor)))
+        except:
+            return ""
+
+    # Corrigir e padronizar coluna 'crm original'
+    df["crm original"] = df["crm original"].apply(formatar_crm_original)
+
+    # Filtrar notificações para o CRM do usuário
+    df_notif = df[df["crm original"] == crm_usuario]
+
+    # Exibir debug
     st.write("Linhas filtradas por CRM original:")
     st.dataframe(df_notif)
+    st.write("CRM original na planilha:", df["crm original"].unique())
+    st.write("CRM do usuário logado:", crm_usuario)
 
-
-    # Converte e filtra datas válidas
+    # Converter e filtrar datas válidas
     df_notif["data"] = pd.to_datetime(df_notif["data"], errors="coerce").dt.date
     df_notif = df_notif[df_notif["data"].notna()]
 
-    # Exibe as notificações
+    # Exibir notificações
     if df_notif.empty:
         st.info("Você não possui notificações.")
     else:
@@ -78,6 +85,7 @@ def mostrar_notificacoes(nome_usuario, df):
             turno_str = row["turno"].capitalize()
             quem_pegou = row["nome"]
             st.markdown(f"- {quem_pegou} pegou seu plantão do dia {data_str} turno {turno_str}")
+
     st.write("CRM original na planilha:", df["crm original"].unique())
     st.write("CRM do usuário logado:", crm_usuario)
 
