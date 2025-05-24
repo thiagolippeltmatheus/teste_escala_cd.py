@@ -49,8 +49,9 @@ def tratar_campo(valor):
 
 
 def mostrar_notificacoes(nome_usuario, df):
+    df["repassado por"] = df["repassado por"].astype(str)
     df_notif = df[df['repassado por'].notna() & ~df['repassado por'].str.lower().str.contains("vaga")]
-    df_notif = df_notif[df_notif['repassado por'].str.strip().str.lower() == nome_usuario.strip().lower()]
+
 
     if df_notif.empty:
         st.info("Você não possui notificações.")
