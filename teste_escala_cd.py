@@ -50,18 +50,15 @@ def tratar_campo(valor):
 
 
 def mostrar_notificacoes(nome_usuario, df):
-    df["repassado por"] = df["repassado por"].astype(str)
-
-    def normalizar(texto):
-        return unicodedata.normalize("NFKD", texto).encode("ascii", errors="ignore").decode("utf-8").strip().lower()
-
-    nome_normalizado = normalizar(nome_usuario)
+    df["crm original"] = df["crm original"].astype(str)
+    
+    # Buscar o CRM do usuário logado
+    crm_usuario = df_usuarios[df_usuarios["nome"] == nome_usuario]["crm"].astype(str).values[0]
 
     df_notif = df[
-        df["repassado por"].notna() &
-        df["repassado por"].str.strip().ne("") &
-        ~df["repassado por"].str.lower().str.startswith("vaga") &
-        df["repassado por"].apply(lambda x: normalizar(str(x))) == nome_normalizado
+        df["crm original"].notna() &
+        df["crm original"].str.strip().ne("") &
+        df["crm original"].str.strip() == crm_usuario.strip()
     ]
 
     if df_notif.empty:
@@ -73,6 +70,9 @@ def mostrar_notificacoes(nome_usuario, df):
             turno_str = row['turno'].capitalize()
             quem_pegou = row['nome']
             st.markdown(f"- {quem_pegou} pegou seu plantão do dia {data_str} turno {turno_str}")
+    st.write("Nomes normalizados na coluna:")
+    st.write(df["repassado por"].apply(lambda x: normalizar(str(x))).unique())
+    st.write("Usuário logado:", nome_normalizado)
 
 # Nomes das planilhas
 NOME_PLANILHA_ESCALA = 'Escala_Maio_2025_teste'
