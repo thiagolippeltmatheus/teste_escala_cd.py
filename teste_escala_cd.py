@@ -63,8 +63,8 @@ def mostrar_notificacoes(nome_usuario, df):
             st.markdown(f"- {quem_pegou} pegou seu plantão do dia {data_str} turno {turno_str}")
 
 # Nomes das planilhas
-NOME_PLANILHA_ESCALA = 'Escala_Maio_2025'
-NOME_PLANILHA_USUARIOS = 'usuarios'
+NOME_PLANILHA_ESCALA = 'Escala_Maio_2025_teste'
+NOME_PLANILHA_USUARIOS = 'usuarios_teste'
 
 # Conecta e carrega planilhas
 gc = conectar_gspread()
@@ -143,11 +143,13 @@ if autenticado:
 
     df["data"] = pd.to_datetime(df["data"], dayfirst=True).dt.date
     df["turno"] = df["turno"].str.lower()
-    with aba_notificacoes:
-        mostrar_notificacoes(nome_usuario, df)
+
 
 
     aba_calendario, aba_mural, aba_notificacoes = st.tabs(["📅 Calendário", "📌 Mural de Vagas", "🔔 Notificações"])
+
+    with aba_notificacoes:
+        mostrar_notificacoes(nome_usuario, df)
 
     with aba_calendario:
         data_plantoa = st.date_input("Selecione a data do plantão", format="DD/MM/YYYY")
