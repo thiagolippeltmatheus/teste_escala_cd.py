@@ -209,7 +209,10 @@ if autenticado:
                             st.info("Você já está escalado neste turno.")
                     elif status == "repasse" and not ja_escalado:
                         if st.button("Assumir", key=f"assumir_{idx}"):
+                            df.at[idx, "repassado por"] = df.at[idx, "nome"]
+                            df.at[idx, "crm original"] = df.at[idx, "crm"]
                             df.at[idx, "nome"] = nome_usuario
+                            df.at[idx, "crm"] = df_usuarios[df_usuarios['nome'] == nome_usuario]["crm"].values[0]
                             df.at[idx, "status"] = "extra"
                             salvar_planilha(df, ws_escala)
                             st.success("Você assumiu o plantão com sucesso!")
@@ -312,7 +315,10 @@ if autenticado:
                     elif status == "repasse":
                         if not ja_escalado:
                             if st.button("Assumir", key=f"assumir_mural_{idx}"):
+                                df.at[idx, "repassado por"] = df.at[idx, "nome"]
+                                df.at[idx, "crm original"] = df.at[idx, "crm"]
                                 df.at[idx, "nome"] = nome_usuario
+                                df.at[idx, "crm"] = df_usuarios[df_usuarios['nome'] == nome_usuario]["crm"].values[0]
                                 df.at[idx, "status"] = "extra"
                                 salvar_planilha(df, ws_escala)
                                 st.success(f"Você assumiu o plantão de {data_str} ({turno_str}) com sucesso!")
