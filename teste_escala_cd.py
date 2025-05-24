@@ -65,7 +65,7 @@ def mostrar_notificacoes(nome_usuario, df):
 
 
     # Converte e filtra datas válidas
-    df_notif["data"] = pd.to_datetime(df_notif["data"], errors="coerce")
+    df_notif["data"] = pd.to_datetime(df_notif["data"], errors="coerce").dt.date
     df_notif = df_notif[df_notif["data"].notna()]
 
     # Exibe as notificações
