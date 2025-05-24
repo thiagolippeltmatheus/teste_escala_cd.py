@@ -70,9 +70,8 @@ def mostrar_notificacoes(nome_usuario, df):
             turno_str = row['turno'].capitalize()
             quem_pegou = row['nome']
             st.markdown(f"- {quem_pegou} pegou seu plantão do dia {data_str} turno {turno_str}")
-    st.write("Nomes normalizados na coluna:")
-    st.write(df["repassado por"].apply(lambda x: normalizar(str(x))).unique())
-    st.write("Usuário logado:", nome_normalizado)
+    st.write("CRM original na planilha:", df["crm original"].unique())
+    st.write("CRM do usuário logado:", crm_usuario)
 
 # Nomes das planilhas
 NOME_PLANILHA_ESCALA = 'Escala_Maio_2025_teste'
