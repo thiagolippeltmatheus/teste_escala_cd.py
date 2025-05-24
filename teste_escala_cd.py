@@ -60,6 +60,9 @@ def mostrar_notificacoes(nome_usuario, df):
         df["crm original"].str.strip().ne("") &
         df["crm original"].str.strip() == crm_usuario.strip()
     ]
+    st.write("Linhas filtradas por CRM original:")
+    st.dataframe(df_notif)
+
 
     # Converte e filtra datas válidas
     df_notif["data"] = pd.to_datetime(df_notif["data"], errors="coerce")
