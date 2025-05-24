@@ -51,10 +51,10 @@ def tratar_campo(valor):
 def mostrar_notificacoes(nome_usuario, df):
     df["repassado por"] = df["repassado por"].astype(str)
     df_notif = df[
-    df["repassado por"].str.strip().str.lower().ne("vaga") &  # exclui 'vaga'
-    df["repassado por"].str.strip().ne("") &                  # exclui células vazias
-    df["repassado por"].notna()                               # exclui NaN
-    ]
+    df["repassado por"].notna() &
+    df["repassado por"].str.strip().ne("") &
+    ~df["repassado por"].str.lower().str.startswith("vaga")
+]
 
 
     if df_notif.empty:
