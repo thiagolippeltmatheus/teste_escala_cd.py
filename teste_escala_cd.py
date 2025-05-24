@@ -65,6 +65,9 @@ def mostrar_notificacoes(nome_usuario, df):
         st.info("Você não possui notificações.")
     else:
         st.subheader("🔔 Suas notificações:")
+        df_notif["data"] = pd.to_datetime(df_notif["data"], errors="coerce")
+        df_notif = df_notif[df_notif["data"].notna()]
+
         for _, row in df_notif.iterrows():
             data_str = pd.to_datetime(row['data']).strftime("%d/%m/%Y")
             turno_str = row['turno'].capitalize()
