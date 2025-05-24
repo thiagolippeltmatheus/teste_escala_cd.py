@@ -1,4 +1,4 @@
-
+import unicodedata
 import streamlit as st
 import pandas as pd
 import gspread
@@ -6,6 +6,7 @@ import json
 import tempfile
 from gspread_dataframe import get_as_dataframe, set_with_dataframe
 from datetime import date
+import unicodedata
 
 turnos_disponiveis = ["manhã", "tarde", "noite", "cinderela"]
 
@@ -50,13 +51,18 @@ def tratar_campo(valor):
 
 def mostrar_notificacoes(nome_usuario, df):
     df["repassado por"] = df["repassado por"].astype(str)
-    df_notif = df[
-    df["repassado por"].notna() &
-    df["repassado por"].str.strip().ne("") &
-    ~df["repassado por"].str.lower().str.startswith("vaga") &
-    df["repassado por"].str.strip().str.lower() == nome_usuario.strip().lower()
-]
 
+    def normalizar(texto):
+        return unicodedata.normalize("NFKD", texto).encode("ascii", errors="ignore").decode("utf-8").strip().lower()
+
+    nome_normalizado = normalizar(nome_usuario)
+
+    df_notif = df[
+        df["repassado por"].notna() &
+        df["repassado por"].str.strip().ne("") &
+        ~df["repassado por"].str.lower().str.startswith("vaga") &
+        df["repassado por"].apply(lambda x: normalizar(str(x))) == nome_normalizado
+    ]
 
     if df_notif.empty:
         st.info("Você não possui notificações.")
