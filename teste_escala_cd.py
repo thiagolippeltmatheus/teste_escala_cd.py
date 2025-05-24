@@ -53,7 +53,8 @@ def mostrar_notificacoes(nome_usuario, df):
     df_notif = df[
     df["repassado por"].notna() &
     df["repassado por"].str.strip().ne("") &
-    ~df["repassado por"].str.lower().str.startswith("vaga")
+    ~df["repassado por"].str.lower().str.startswith("vaga") &
+    df["repassado por"].str.strip().str.lower() == nome_usuario.strip().lower()
 ]
 
 
