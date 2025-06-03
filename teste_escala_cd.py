@@ -6,6 +6,7 @@ import json
 import tempfile
 from gspread_dataframe import get_as_dataframe, set_with_dataframe
 from datetime import date
+import datetime
 import unicodedata
 
 turnos_disponiveis = ["manhã", "tarde", "noite", "cinderela"]
