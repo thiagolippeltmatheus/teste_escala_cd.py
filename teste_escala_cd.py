@@ -141,13 +141,22 @@ if st.session_state.modo_nova_senha:
     if nova_senha:
         if nova_senha.isdigit():
             df_usuarios.loc[df_usuarios["crm"] == tratar_campo(crm_input), "senha"] = nova_senha
-            salvar_planilha(df_usuarios, ws_usuarios)
-            st.sidebar.success("Senha atualizada com sucesso. Refaça o login.")
-            st.session_state.modo_nova_senha = False
-            st.session_state.autenticado = False
-            st.stop()
+            try:
+                gc_local = conectar_gspread()
+                sh_usuarios = gc_local.open(NOME_PLANILHA_USUARIOS)
+                ws_usuarios_atual = sh_usuarios.sheet1
+                salvar_planilha(df_usuarios, ws_usuarios_atual)
+                st.sidebar.success("Senha atualizada com sucesso. Refaça o login.")
+                st.session_state.modo_nova_senha = False
+                st.session_state.autenticado = False
+                st.stop()
+            except Exception as e:
+                st.sidebar.error(f"Erro ao salvar nova senha: {e}")
+                st.stop()
         else:
             st.sidebar.error("A nova senha deve conter apenas números.")
+
+
 
 # Definir variáveis
 autenticado = st.session_state.autenticado
@@ -169,7 +178,8 @@ if autenticado:
 
 
 
-    aba_calendario, aba_mural, aba_notificacoes = st.tabs(["📅 Calendário", "📌 Mural de Vagas", "🔔 Notificações"])
+    aba_calendario, aba_mural, aba_meus_plantoes, aba_notificacoes = st.tabs(["📅 Calendário", "📌 Mural de Vagas", "🗓️ Meus Plantões", "🔔 Notificações"])
+
 
     with aba_notificacoes:
         mostrar_notificacoes(nome_usuario, df)
@@ -341,5 +351,51 @@ if autenticado:
                                 salvar_planilha(df, ws_escala)
                                 st.success(f"Você assumiu o plantão de {data_str} ({turno_str}) com sucesso!")
                                 st.rerun()
+
+
+    with aba_meus_plantoes:
+        st.subheader("🗓️ Plantões do Usuário")
+
+        # Filtro por mês
+        df_usuario = df[df["nome"].str.lower().str.strip() == nome_usuario.lower().strip()]
+        df_usuario["mes"] = pd.to_datetime(df_usuario["data"]).dt.to_period("M").astype(str)
+
+        meses_disponiveis = sorted(df_usuario["mes"].unique(), reverse=True)
+        meses_traduzidos = {
+            "01": "Janeiro", "02": "Fevereiro", "03": "Março", "04": "Abril",
+            "05": "Maio", "06": "Junho", "07": "Julho", "08": "Agosto",
+            "09": "Setembro", "10": "Outubro", "11": "Novembro", "12": "Dezembro"
+        }
+        # Monta uma lista de pares (ex: '2025-05', 'Maio/2025')
+        meses_formatados = [f"{meses_traduzidos[m.split('-')[1]]}/{m.split('-')[0]}" for m in meses_disponiveis]
+        mes_formatado = st.selectbox("Filtrar por mês", meses_formatados)
+        mes_selecionado = meses_disponiveis[meses_formatados.index(mes_formatado)]
+
+
+        df_filtrado = df_usuario[df_usuario["mes"] == mes_selecionado].sort_values("data")
+
+
+        if df_filtrado.empty:
+            st.info("Você não possui plantões neste mês.")
+        else:
+            dias_em_portugues = {
+            "Monday": "segunda-feira",
+            "Tuesday": "terça-feira",
+            "Wednesday": "quarta-feira",
+            "Thursday": "quinta-feira",
+            "Friday": "sexta-feira",
+            "Saturday": "sábado",
+            "Sunday": "domingo"
+}
+
+        for _, row in df_filtrado.iterrows():
+            dia_semana_en = row["data"].strftime("%A")
+            dia_semana_pt = dias_em_portugues.get(dia_semana_en, dia_semana_en)
+            data_str = row["data"].strftime("%d/%m/%Y")
+            turno_str = row["turno"].capitalize()
+            status_str = row["status"] if pd.notna(row["status"]) else "sem status"
+            st.markdown(f"- 📆 **{data_str} ({dia_semana_pt})** — 🕒 **{turno_str}** — 🏷️ *{status_str}*")
+
+
 else:
     st.info("Faça login na barra lateral para acessar a escala de plantão (seta no canto superior esquerdo).")
