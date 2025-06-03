@@ -100,6 +100,12 @@ except Exception as e:
 df_usuarios["crm"] = df_usuarios["crm"].apply(tratar_campo)
 df_usuarios["senha"] = df_usuarios["senha"].apply(tratar_campo)
 
+cookie_nome = st.experimental_get_cookie("nome_usuario")
+if cookie_nome and cookie_nome in df_usuarios["nome"].values:
+    st.session_state.autenticado = True
+    st.session_state.nome_usuario = cookie_nome
+
+
 # Estado de sessão
 if "autenticado" not in st.session_state:
     st.session_state.autenticado = False
@@ -127,7 +133,10 @@ if st.sidebar.button("Entrar"):
                 st.session_state.modo_nova_senha = True
             else:
                 st.session_state.autenticado = True
-                st.session_state.nome_usuario = nome_usuario
+                # Criar cookie com validade de 7 dias
+                expira = datetime.datetime.now() + datetime.timedelta(days=7)
+                st.experimental_set_cookie("nome_usuario", nome_usuario, expires=expira)
+
                 st.sidebar.success(f"Bem-vindo, {nome_usuario}!")
                 st.rerun()
         else:
@@ -164,6 +173,13 @@ nome_usuario = st.session_state.nome_usuario
 
 
 st.title("Escala de Plantão")
+
+if autenticado:
+    if st.sidebar.button("Sair"):
+        st.session_state.autenticado = False
+        st.session_state.nome_usuario = ""
+        st.experimental_set_cookie("nome_usuario", "", expires=datetime.datetime.now() - datetime.timedelta(days=1))
+        st.rerun()
 
 
 if autenticado:
