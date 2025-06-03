@@ -100,9 +100,6 @@ except Exception as e:
 df_usuarios["crm"] = df_usuarios["crm"].apply(tratar_campo)
 df_usuarios["senha"] = df_usuarios["senha"].apply(tratar_campo)
 
-if cookie_nome and cookie_nome in df_usuarios["nome"].values:
-    st.session_state.autenticado = True
-    st.session_state.nome_usuario = cookie_nome
 
 
 # Estado de sessão
