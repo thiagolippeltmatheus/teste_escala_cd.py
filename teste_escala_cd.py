@@ -110,9 +110,8 @@ if "modo_nova_senha" not in st.session_state:
     st.session_state.modo_nova_senha = False
 
 # Sidebar Login
-st.sidebar.markdown("**Login:**")
-crm_input = st.sidebar.text_input("username", label_visibility="collapsed", placeholder="CRM")
-senha_input = st.sidebar.text_input("password", label_visibility="collapsed", type="password", placeholder="Senha")
+crm_input = st.sidebar.text_input("CRM", placeholder="Digite seu CRM")
+senha_input = st.sidebar.text_input("Senha", type="password", placeholder="Digite sua senha")
 
 
 # Botão de login
