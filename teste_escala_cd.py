@@ -6,7 +6,6 @@ import json
 import tempfile
 from gspread_dataframe import get_as_dataframe, set_with_dataframe
 from datetime import date
-import datetime
 import unicodedata
 
 turnos_disponiveis = ["manhã", "tarde", "noite", "cinderela"]
@@ -90,6 +89,7 @@ def mostrar_notificacoes(nome_usuario, df):
 NOME_PLANILHA_ESCALA = 'Escala_Maio_2025_teste'
 NOME_PLANILHA_USUARIOS = 'usuarios_teste'
 
+
 # Conecta e carrega planilhas
 gc = conectar_gspread()
 try:
@@ -100,8 +100,6 @@ except Exception as e:
 
 df_usuarios["crm"] = df_usuarios["crm"].apply(tratar_campo)
 df_usuarios["senha"] = df_usuarios["senha"].apply(tratar_campo)
-
-
 
 # Estado de sessão
 if "autenticado" not in st.session_state:
@@ -130,9 +128,7 @@ if st.sidebar.button("Entrar"):
                 st.session_state.modo_nova_senha = True
             else:
                 st.session_state.autenticado = True
-                # Criar cookie com validade de 7 dias
-                expira = datetime.datetime.now() + datetime.timedelta(days=7)
-
+                st.session_state.nome_usuario = nome_usuario
                 st.sidebar.success(f"Bem-vindo, {nome_usuario}!")
                 st.rerun()
         else:
@@ -169,12 +165,6 @@ nome_usuario = st.session_state.nome_usuario
 
 
 st.title("Escala de Plantão")
-
-if autenticado:
-    if st.sidebar.button("Sair"):
-        st.session_state.autenticado = False
-        st.session_state.nome_usuario = ""
-        st.rerun()
 
 
 if autenticado:
